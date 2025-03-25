@@ -22,12 +22,26 @@ if "Quantity" not in df.columns:
 
 df["Quantity"] = df["Quantity"].apply(clean)
 
-# Convert all columns to string, but Quantity will be quoted because it's str
-for col in df.columns:
-    if col != "Quantity":
-        df[col] = df[col].astype(object)
+# Save all columns as text but ensure Quantity values are quoted
+# Export using QUOTE_ALL to force quotes around everything
+# Then remove quotes from other columns manually if needed
 
-# Save CSV with quoting only non-numeric fields (i.e., Quantity now gets quoted)
-df.to_csv("factorywheelwarehouse_INVENTORY.csv", index=False, quoting=csv.QUOTE_NONNUMERIC)
+# Save to temporary file with all quotes
+df.to_csv("_temp_inventory.csv", index=False, quoting=csv.QUOTE_ALL)
 
-print("✅ Quantity column cleaned and saved as quoted text.")
+# Read back and rewrite with only Quantity quoted
+with open("_temp_inventory.csv", "r") as infile, open("factorywheelwarehouse_INVENTORY.csv", "w") as outfile:
+    header = infile.readline()
+    outfile.write(header)
+    for line in infile:
+        parts = line.strip().split(",")
+        cleaned = []
+        for i, col in enumerate(df.columns):
+            val = parts[i].strip('"')
+            if col == "Quantity":
+                cleaned.append(f'"{val}"')
+            else:
+                cleaned.append(val)
+        outfile.write(",".join(cleaned) + "\n")
+
+print("✅ Quantity column cleaned and saved as quoted text only.")
