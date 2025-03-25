@@ -1,0 +1,30 @@
+name: FTP Inventory Cleaner
+
+on:
+  workflow_dispatch:
+
+jobs:
+  clean_csv:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Python and FTP tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp python3 python3-pip
+          pip3 install pandas
+
+      - name: Download CSV from FTP (Skip SSL Verify)
+        run: |
+          lftp -u ${{ secrets.FTP_USER }},${{ secrets.FTP_PASS }} ${{ secrets.FTP_HOST }} -e "set ssl:verify-certificate no; get factorywheelwarehouse_INVENTORY.csv -o original.csv; bye"
+
+      - name: Clean 'Quantity' column
+        run: |
+          python3 qty.py
+
+      - name: Upload cleaned file back to FTP (Skip SSL Verify)
+        run: |
+          lftp -u ${{ secrets.FTP_USER }},${{ secrets.FTP_PASS }} ${{ secrets.FTP_HOST }} -e "set ssl:verify-certificate no; put factorywheelwarehouse_INVENTORY.csv -o factorywheelwarehouse_INVENTORY.csv; bye"
