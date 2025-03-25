@@ -1,9 +1,9 @@
 name: FTP Inventory Cleaner
 
 on:
-  workflow_dispatch:  # allows manual runs
+  workflow_dispatch:
   schedule:
-    - cron: "*/5 * * * *"  # runs every 5 minutes
+    - cron: "15 5 * * *"  # Runs daily at 12:15 AM EST (5:15 AM UTC)
 
 jobs:
   clean_csv:
