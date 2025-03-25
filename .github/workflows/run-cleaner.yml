@@ -19,7 +19,7 @@ jobs:
 
       - name: Download CSV from FTP (Skip SSL Verify)
         run: |
-          lftp -u ${{ secrets.FTP_USER }},${{ secrets.FTP_PASS }} ${{ secrets.FTP_HOST }} -e "set ssl:verify-certificate no; get factorywheelwarehouse_INVENTORY.csv -o original.csv; bye"
+          lftp -d -u ${{ secrets.FTP_USER }},${{ secrets.FTP_PASS }} ${{ secrets.FTP_HOST }} -e "set ssl:verify-certificate no; get factorywheelwarehouse_INVENTORY.csv -o original.csv; bye"
 
       - name: Clean 'Quantity' column
         run: |
@@ -27,4 +27,4 @@ jobs:
 
       - name: Upload cleaned file back to FTP (Skip SSL Verify)
         run: |
-          lftp -u ${{ secrets.FTP_USER }},${{ secrets.FTP_PASS }} ${{ secrets.FTP_HOST }} -e "set ssl:verify-certificate no; put factorywheelwarehouse_INVENTORY.csv -o factorywheelwarehouse_INVENTORY.csv; bye"
+          lftp -d -u ${{ secrets.FTP_USER }},${{ secrets.FTP_PASS }} ${{ secrets.FTP_HOST }} -e "set ssl:verify-certificate no; put factorywheelwarehouse_INVENTORY.csv -o factorywheelwarehouse_INVENTORY.csv; bye"
